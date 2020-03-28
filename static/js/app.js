@@ -3,6 +3,7 @@ var jsonfile = './data/samples.json';
 var data;
 var metadataid;
 var initSample = 0;
+var newSample = 0;
 var newSample = document.getElementById("#selDataset");
 var selector = d3.select("#selDataset");
 
@@ -60,24 +61,26 @@ function makePlots(sampleId) {
             title: "Top 10 OTU for this Subject",
             yaxis: plot_T10_otu_ids,
         };
-        Plotly.plot("bar", barData, barLayout); 
+        var layout = [barLayout]
+        Plotly.newPlot("bar", barData, barLayout); 
 
         //Make pieplot
         //console.log("piechart")
-        var pieplot = [{
+        var piePlot = [{
             values: plot_T10_samp,
             lables: plot_T10_otu_ids,
             hovertext: plot_T10_otu_lbl,
             hole: .4,
             type: "pie",
             }];
-        var pielayout = {
+        var pieLayout = {
             title: "Top 10 Percentages",
             showlegend: false,
         }
-        Plotly.plot('pie',pieplot,pielayout);
+        Plotly.newPlot('pie',piePlot,pieLayout);
 
         //Make bubbleplot
+        d3.select('#bubble').html('')
         var bubbledata = {
           x: samplePlot[0].otu_ids,
           y: samplePlot[0].sample_values,
@@ -90,19 +93,22 @@ function makePlots(sampleId) {
           }
         };
     
-        var data = [bubbledata];
-        var bubblelayout = {
+        var bubbleData = [bubbledata];
+        var bubbleLayout = {
             title: "Interactive Biodiversity Bubble Chart",
             height: 600,
             width: 1200,
             xaxis: {title: "OTU ID"}
         };
-        Plotly.newPlot("bubble", data, bubblelayout);
+        Plotly.newPlot("bubble", bubbleData, bubbleLayout);
     });
 };
 
 function optionChanged(newSample) {
     //console.log('optionchanged#: ',newSample)
+    // d3.select('#bar').html('')
+    // d3.select('#pie').html('')
+    // d3.select('#bubble').html('')
     makePlots(newSample);
     demoInfo(newSample);
   }

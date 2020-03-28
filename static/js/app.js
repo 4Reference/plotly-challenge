@@ -3,7 +3,6 @@ var jsonfile = './data/samples.json';
 var data;
 var metadataid;
 var initSample = 0;
-var newSample = 0;
 var newSample = document.getElementById("#selDataset");
 var selector = d3.select("#selDataset");
 
@@ -17,9 +16,9 @@ d3.json(jsonfile).then(function(data) {
         .property("value", name);
     });
     const initSample = names[0];
+    //console.log('initSample#: ',initSample)
     makePlots(initSample);
     demoInfo(initSample);
-    //console.log('initSample#: ',initSample)
 });
 
 function demoInfo(sampleId) {
@@ -45,8 +44,10 @@ function makePlots(sampleId) {
         let plot_T10_otu_ids = samplePlot[0].otu_ids.slice(0, 10);
         let plot_T10_samp = samplePlot[0].sample_values.slice(0, 10);
         let plot_T10_otu_lbl = samplePlot[0].otu_labels.slice(0, 10);
+        //console.log('sample data collected')
 
         //Make barplot
+        //console.log("barchart")
         var barTrace = {
             x: plot_T10_samp.reverse(),
             y: plot_T10_otu_ids.map(x => `OTU ${x}`).reverse(),
@@ -59,9 +60,10 @@ function makePlots(sampleId) {
             title: "Top 10 OTU for this Subject",
             yaxis: plot_T10_otu_ids,
         };
-        Plotly.newPlot("bar", barData, barLayout); 
+        Plotly.plot("bar", barData, barLayout); 
 
         //Make pieplot
+        //console.log("piechart")
         var pieplot = [{
             values: plot_T10_samp,
             lables: plot_T10_otu_ids,
@@ -73,27 +75,29 @@ function makePlots(sampleId) {
             title: "Top 10 Percentages",
             showlegend: false,
         }
-        Plotly.newPlot('pie',pieplot,pielayout);
+        Plotly.plot('pie',pieplot,pielayout);
 
         //Make bubbleplot
-        var bubbleTrace = {
-            x: samplePlot[0].otu_ids,
-            y: samplePlot[0].sample_values,
-            mode: 'markers',
-            text: samplePlot[0].otu_labels,
-            marker: {
-                color: samplePlot[0].otu_ids,
-                size: samplePlot[0].sample_values,
-                colorscale: "Earth"
-            }
+        var bubbledata = {
+          x: samplePlot[0].otu_ids,
+          y: samplePlot[0].sample_values,
+          text: samplePlot[0].otu_labels,
+          mode: `markers`,
+          marker: {
+            size: samplePlot[0].sample_values,
+            color: samplePlot[0].otu_ids,
+            colorscale: "Earth"
+          }
         };
-        var bubbleLayout = {
+    
+        var data = [bubbledata];
+        var bubblelayout = {
             title: "Interactive Biodiversity Bubble Chart",
-            showlegend: false,
             height: 600,
-            width: 1200
+            width: 1200,
+            xaxis: {title: "OTU ID"}
         };
-        Plotly.newPlot("bubble", bubbleTrace, bubbleLayout);
+        Plotly.newPlot("bubble", data, bubblelayout);
     });
 };
 

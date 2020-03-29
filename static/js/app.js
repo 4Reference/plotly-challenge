@@ -83,9 +83,9 @@ function makePlots(sampleId) {
         Plotly.newPlot('pie',piePlot,pieLayout); */
 
         // Make guage plot
-        console.log("gaugeplot")
+        //console.log("gaugeplot")
         var wfreq = sampleMeta.map(d => d.wfreq) // used in gauge
-        console.log(`Washing Freq: ${wfreq}`)
+        //console.log(`Washing Freq: ${wfreq}`)
         var gaugeData = {
             domain: {x: [0, 1], 
                      y: [0, 1]},

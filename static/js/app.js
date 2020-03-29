@@ -2,6 +2,7 @@
 var jsonfile = './data/samples.json';
 var data;
 var metadataid;
+var wfreq = 0;
 var initSample = 0;
 var newSample = 0;
 var newSample = document.getElementById("#selDataset");
@@ -26,7 +27,7 @@ function demoInfo(sampleId) {
     d3.json(jsonfile).then(function(data) {
         let metaData = data.metadata
         let sampleMeta = metaData.filter(mdata => mdata.id == sampleId);
-        //console.log('metaData#: ', sampleMeta[0]);
+        console.log('metaData#: ', sampleMeta[0]);
         var panelMetadata = d3.select("#sample-metadata");
         panelMetadata.html("");
         Object.entries(sampleMeta[0]).forEach(([key, value]) => {
@@ -38,6 +39,8 @@ function demoInfo(sampleId) {
 
 function makePlots(sampleId) {
     d3.json(jsonfile).then(function(data) {
+        let metaData = data.metadata
+        let sampleMeta = metaData.filter(mdata => mdata.id == sampleId);
         let plotData = data.samples
         //console.log('plotData: ',plotData)
         let samplePlot = plotData.filter(pdata => pdata.id == sampleId);
@@ -58,13 +61,13 @@ function makePlots(sampleId) {
         };
         var barData = [barTrace];
         var barLayout = {
-            title: "Top 10 OTU for this Subject",
+            title: "<B>Top 10 OTU for this Subject</B>",
             yaxis: plot_T10_otu_ids,
         };
         var layout = [barLayout]
         Plotly.newPlot("bar", barData, barLayout); 
 
-        //Make pieplot
+/*      //Make pieplot **note: this was a place holder for the gaugeplot
         //console.log("piechart")
         var piePlot = [{
             values: plot_T10_samp,
@@ -77,8 +80,39 @@ function makePlots(sampleId) {
             title: "Top 10 Percentages",
             showlegend: false,
         }
-        Plotly.newPlot('pie',piePlot,pieLayout);
+        Plotly.newPlot('pie',piePlot,pieLayout); */
 
+        // Make guage plot
+        console.log("gaugeplot")
+        var wfreq = sampleMeta.map(d => d.wfreq) // used in gauge
+        console.log(`Washing Freq: ${wfreq}`)
+        var gaugeData = {
+            domain: {x: [0, 1], 
+                     y: [0, 1]},
+            title: {text: "<B>Belly Button Washing Frequency</B> <br>Scrubs Per Week", 
+                    font: {size: 16}},
+            type: "indicator", 
+            mode: "gauge",
+            gauge:{
+                axis: {range: [0, 9]}, 
+                steps: [{range: [0, 1], color: 'rgba(255, 255, 255, 0)'},
+                        {range: [1, 2], color: "floralwhite"},
+                        {range: [2, 3], color: "linen"},
+                        {range: [3, 4], color: 'rgba(210, 206, 145, .5)'},
+                        {range: [4, 5], color: 'rgba(202, 209, 95, .5)'},
+                        {range: [5, 6], color: 'rgba(170, 202, 42, .5)'},
+                        {range: [6, 7], color: 'rgba(110, 154, 22, .5)'},
+                        {range: [7, 8], color: "darkseagreen"},
+                        {range: [8, 9], color: "forestgreen"}
+                    ], 
+                threshold: {line: {color: "red", width: 4},
+                            thickness: 0.75, value: parseInt(wfreq)}
+                },
+                };
+        var gaugeData = [gaugeData]
+        var gaugeLayout = {margin: {t: 0, b: 0}};
+        Plotly.newPlot("gauge", gaugeData, gaugeLayout);
+    
         //Make bubbleplot
         d3.select('#bubble').html('')
         var bubbledata = {
@@ -95,7 +129,7 @@ function makePlots(sampleId) {
     
         var bubbleData = [bubbledata];
         var bubbleLayout = {
-            title: "Interactive Biodiversity Bubble Chart",
+            title: "<B>Interactive Biodiversity Bubble Chart</B>",
             height: 600,
             width: 1200,
             xaxis: {title: "OTU ID"}
